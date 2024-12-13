@@ -116,3 +116,19 @@ def test_get_patients_with_multiple_entries(test_client):
     assert response.status_code == 200
     assert len(data['data']) == 3
     assert any(p['first_name'] == "Alice" for p in data['data'])
+
+def test_get_patients_edge_cases(test_client):
+    patient = Patient(
+        id=4,
+        first_name="",
+        middle_name=None,
+        last_name="Doe",
+        date_of_birth=None,
+        gender="Other",
+        address=""
+    )
+    db.session.add(patient)
+    db.session.commit()
+
+    response = test_client.get('/api/patients')
+    data = json.loads(response.data)
