@@ -13,3 +13,12 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['TESTING'] = True
 
 db = SQLAlchemy(app)
+
+class Patient(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(50))
+    middle_name = db.Column(db.String(50))
+    last_name = db.Column(db.String(50))
+    date_of_birth = db.Column(db.Date)
+    gender = db.Column(db.String(10))
+    address = db.Column(db.String(255))
