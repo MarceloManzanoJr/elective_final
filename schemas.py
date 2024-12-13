@@ -22,6 +22,9 @@ class Patient(db.Model):
     address = db.Column(db.String(100), nullable=True)
 
     def to_dict(self):
+        if isinstance(self.date_of_birth, str):
+         self.date_of_birth = datetime.strptime(self.date_of_birth, "%Y-%m-%d")
+
         return {
             "patient_id": self.patient_id,
             "first_name": self.first_name,
