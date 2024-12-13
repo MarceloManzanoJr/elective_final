@@ -84,3 +84,35 @@ def test_get_patients_empty_db(test_client):
     assert 'data' in data
     assert isinstance(data['data'], list)
     assert len(data['data']) == 0
+
+def test_get_patients_with_multiple_entries(test_client):
+    """Test the GET /api/patients endpoint with multiple patients."""
+    patients = [
+        Patient(
+            id=2,
+            first_name="Alice",
+            middle_name="J.",
+            last_name="Smith",
+            date_of_birth="1990-05-20",
+            gender="Female",
+            address="123 Oak Street"
+        ),
+        Patient(
+            id=3,
+            first_name="Bob",
+            middle_name="A.",
+            last_name="Jones",
+            date_of_birth="1975-09-15",
+            gender="Male",
+            address="456 Maple Avenue"
+        ),
+    ]
+    db.session.add_all(patients)
+    db.session.commit()
+
+    response = test_client.get('/api/patients')
+    data = json.loads(response.data)
+
+    assert response.status_code == 200
+    assert len(data['data']) == 3
+    assert any(p['first_name'] == "Alice" for p in data['data'])
