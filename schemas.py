@@ -180,3 +180,21 @@ def delete_patient(patient_id):
             "data": "Patient deleted successfully."
         }
     ), HTTPStatus.OK
+
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify(
+        {
+            "success": False,
+            "error": "Resource not found"
+        }
+    ), HTTPStatus.NOT_FOUND
+
+@app.errorhandler(500)
+def internal_server_error(error):
+    return jsonify(
+        {
+            "success": False,
+            "error": "Internal Server Error"
+        }
+    ), HTTPStatus.INTERNAL_SERVER_ERROR
