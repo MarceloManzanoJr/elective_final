@@ -32,3 +32,9 @@ def serialize_patient(patient):
         'gender': patient.gender,
         'address': patient.address,
     }
+
+@app.route('/api/patients', methods=['GET'])
+def test_get_all_patients():
+    patients = Patient.query.all()
+    patients_data = [serialize_patient(p) for p in patients]
+    return jsonify({'data': patients_data})
