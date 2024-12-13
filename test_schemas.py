@@ -38,3 +38,36 @@ def test_get_all_patients():
     patients = Patient.query.all()
     patients_data = [serialize_patient(p) for p in patients]
     return jsonify({'data': patients_data})
+
+@pytest.fixture(scope='module')
+def test_client():
+    with app.test_client() as client:
+        with app.app_context():
+            db.create_all()
+            # Add sample data
+            patient = Patient(
+                id=1,
+                first_name="John",
+                middle_name="Michael",
+                last_name="Doe",
+                date_of_birth="1985-06-15",
+                gender="Male",
+                address="999 Pine Street"
+            )
+            db.session.add(patient)
+            db.session.commit()
+            yield client
+            db.session.remove()
+            db.drop_all()
+
+# Test cases
+def test_get_patients(test_client):
+    """Test the GET /api/patients endpoint."""
+    response = test_client.get('/api/patients')
+    assert response.status_code == 200
+    data = json.loads(response.data)
+    assert 'data' in data
+    assert isinstance(data['data'], list)
+    if data['data']:
+        assert data['data'][0]['id'] == 1
+        assert data['data'][0]['first_name'] == "John"
