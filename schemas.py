@@ -158,3 +158,25 @@ def update_patient(patient_id):
             "data": patient.to_dict()
         }
     ), HTTPStatus.OK
+
+@app.route("/api/patients/<int:patient_id>", methods=["DELETE"])
+def delete_patient(patient_id):
+    patient = Patient.query.get(patient_id)
+
+    if patient is None: 
+        return jsonify(
+            {
+                "success": False, 
+                "error": "Patient not found."
+            }
+        ), HTTPStatus.NOT_FOUND
+    
+    db.session.delete(patient)
+    db.session.commit()
+
+    return jsonify(
+        {
+            "success": True,
+            "data": "Patient deleted successfully."
+        }
+    ), HTTPStatus.OK
