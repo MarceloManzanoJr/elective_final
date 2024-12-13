@@ -1,5 +1,7 @@
-from flask import Flask
+from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
+from http import HTTPStatus
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -29,3 +31,16 @@ class Patient(db.Model):
             "date_of_birth": self.date_of_birth.strftime("%Y-%m-%d"),
             "address": self.address,
         }
+@app.route("/api/patients", methods=["GET"])
+def get_patients():
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    patients = Patient.query.paginate(page=page, per_page=per_page, error_out=False)
+        
+    return jsonify({
+        "success": True,
+        "data": [patient.to_dict() for patient in patients.items],
+        "total": patients.total,
+        "page": patients.page,
+        "pages": patients.pages
+    }), HTTPStatus.OK
