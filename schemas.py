@@ -115,3 +115,46 @@ def create_patient():
             "data": new_patient.to_dict(),
         }
     ), HTTPStatus.CREATED
+
+@app.route("/api/patients/<int:patient_id>", methods=["PUT"])
+def update_patient(patient_id):
+    patient = Patient.query.get(patient_id)
+
+    if patient is None: 
+        return jsonify(
+            {
+                "success": False,
+                "error":"Patient not found"
+            }
+        ), HTTPStatus.NOT_FOUND
+    
+    try:
+        data = request.get_json()
+    except Exception:
+        return jsonify({
+            "success": False,
+            "error": "Invalid JSON format."
+        }), HTTPStatus.BAD_REQUEST
+
+    update_fields = ["first_name", "middle_name", "last_name", "gender", "date_of_birth", "address"]
+    for key in update_fields:
+        if key in data:
+            if key == 'date_of_birth':
+                try:
+                    setattr(patient, key, datetime.strptime(data[key], '%Y-%m-%d').date())
+                except ValueError:
+                    return jsonify({
+                        "success": False,
+                        "error": "Invalid date format for 'date_of_birth'. Expected 'YYYY-MM-DD'."
+                    }), HTTPStatus.BAD_REQUEST
+            else:
+                setattr(patient, key, data[key])
+    
+    db.session.commit()
+
+    return jsonify(
+        {
+            "success": True,
+            "data": patient.to_dict()
+        }
+    ), HTTPStatus.OK
