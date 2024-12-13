@@ -71,3 +71,16 @@ def test_get_patients(test_client):
     if data['data']:
         assert data['data'][0]['id'] == 1
         assert data['data'][0]['first_name'] == "John"
+
+def test_get_patients_empty_db(test_client):
+    """Test the GET /api/patients endpoint with an empty database."""
+    db.session.query(Patient).delete()
+    db.session.commit()
+
+    response = test_client.get('/api/patients')
+    data = json.loads(response.data)
+
+    assert response.status_code == 200
+    assert 'data' in data
+    assert isinstance(data['data'], list)
+    assert len(data['data']) == 0
