@@ -22,3 +22,13 @@ class Patient(db.Model):
     date_of_birth = db.Column(db.Date)
     gender = db.Column(db.String(10))
     address = db.Column(db.String(255))
+def serialize_patient(patient):
+    return {
+        'id': patient.id,
+        'first_name': patient.first_name,
+        'middle_name': patient.middle_name,
+        'last_name': patient.last_name,
+        'date_of_birth': str(patient.date_of_birth),
+        'gender': patient.gender,
+        'address': patient.address,
+    }
