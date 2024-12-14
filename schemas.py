@@ -88,6 +88,8 @@ def admin_only():
 
 
 @app.route("/api/patients", methods=["GET"])
+@jwt_required()
+@role_required('admin')
 def get_patients():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
@@ -102,6 +104,7 @@ def get_patients():
     }), HTTPStatus.OK
 
 @app.route("/api/patients/<int:patient_id>", methods=["GET"])
+@jwt_required()
 def get_patient(patient_id):
     patient = Patient.query.get(patient_id)
     if not patient:
