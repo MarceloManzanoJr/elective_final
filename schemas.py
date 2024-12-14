@@ -178,6 +178,8 @@ def create_patient():
     ), HTTPStatus.CREATED
 
 @app.route("/api/patients/<int:patient_id>", methods=["PUT"])
+@jwt_required()
+@role_required('admin') 
 def update_patient(patient_id):
     patient = Patient.query.get(patient_id)
 
@@ -221,6 +223,7 @@ def update_patient(patient_id):
     ), HTTPStatus.OK
 
 @app.route("/api/patients/<int:patient_id>", methods=["DELETE"])
+@jwt_required()
 def delete_patient(patient_id):
     patient = Patient.query.get(patient_id)
 
