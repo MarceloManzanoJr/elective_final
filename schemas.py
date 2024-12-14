@@ -45,6 +45,26 @@ class Patient(db.Model):
             "date_of_birth": self.date_of_birth.strftime("%Y-%m-%d"),
             "address": self.address,
         }
+class PatientSchema(Schema):
+    first_name = fields.Str(required=True)
+    last_name = fields.Str(required=True)
+    gender = fields.Str(required=True, validate=lambda x: x in ['Male', 'Female'])
+    date_of_birth = fields.Date(required=True)
+    address = fields.Str()
+
+patient_schema = PatientSchema()
+
+def role_required(required_role):
+    def decorator(fn):
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            claims = get_jwt()
+            if claims.get('role') != required_role:
+                return jsonify({"error": "Access forbidden"}), HTTPStatus.FORBIDDEN
+            return fn(*args, **kwargs)
+        return wrapper
+    return decorator
+
 @app.route("/api/patients", methods=["GET"])
 def get_patients():
     page = request.args.get('page', 1, type=int)
