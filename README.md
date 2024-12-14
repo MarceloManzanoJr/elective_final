@@ -1,17 +1,16 @@
 # CUSTOMER AND HEALTH_CENTER
 
 ## Description
-Brief description of your system
+This project appears to be a Python-based backend API for a health center system. It includes route handlers, database models, schemas, and testing components
 
 ## Installation
-```cmd
 pip install -r requirements.txt
 
 ## Configuration
 Environment variables needed:
 
-DATABASE_URL
-SECRET_KEY
+DATABASE_URL = 'mysql+pymysql://root:root@localhost/health_center'
+SECRET_KEY = os.getenv
 
 ## API Endpoints
 
@@ -21,13 +20,12 @@ SECRET_KEY
 | /api/admin     | GET    | Protected Admin route    |
 | /api/patients  | GET    | Check patients data      |
 | /api/patients  | POST   | Add new health center
-|/api/patients/<int:patient_id> |GET    |
-|/api/patients/<int:patient_id> |PUT    |
-|/api/patients/<int:patient_id> |DELETE |
+|/api/patients/<int:patient_id> |GET    | get specific id |
+|/api/patients/<int:patient_id> |PUT    | update the table|
+|/api/patients/<int:patient_id> |DELETE | delete the table|
 
 ## Testing
- Instructions for running tests
-…
+it test the get and delete of my petients table
 
 ## Git Commit Guidelines
 
