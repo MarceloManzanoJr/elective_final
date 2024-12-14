@@ -123,6 +123,8 @@ def get_patient(patient_id):
     ), HTTPStatus.OK
 
 @app.route("/api/patients", methods=["POST"])
+@jwt_required()
+@role_required('admin')
 def create_patient():
     try:
         data = request.get_json()
