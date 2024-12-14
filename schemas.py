@@ -65,6 +65,23 @@ def role_required(required_role):
         return wrapper
     return decorator
 
+@app.route('/api/auth/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    if username == 'Marcelo' and password == 'manzano':
+        access_token = create_access_token(
+            identity=username,
+            additional_claims={"role": "admin"}
+        )
+        return jsonify(access_token=access_token), HTTPStatus.OK
+
+    return jsonify({"error": "Invalid credentials"}), HTTPStatus.UNAUTHORIZED
+
+
+
 @app.route("/api/patients", methods=["GET"])
 def get_patients():
     page = request.args.get('page', 1, type=int)
