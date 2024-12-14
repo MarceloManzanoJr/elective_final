@@ -48,6 +48,7 @@ class Patient(db.Model):
 class PatientSchema(Schema):
     first_name = fields.Str(required=True)
     last_name = fields.Str(required=True)
+    middle_name = fields.Str(required=True)
     gender = fields.Str(required=True, validate=lambda x: x in ['Male', 'Female'])
     date_of_birth = fields.Date(required=True)
     address = fields.Str()
@@ -127,55 +128,15 @@ def get_patient(patient_id):
 @role_required('admin')
 def create_patient():
     try:
-        data = request.get_json()
-    except Exception:
-        return jsonify({
-            "success": False,
-            "error": "Invalid JSON format."
-        }), HTTPStatus.BAD_REQUEST
-    
-    required_fields = ["first_name", "last_name", "gender", "date_of_birth"]
-    for field in required_fields:
-        if field not in data:
-            return jsonify(
-                {
-                    "success": False,
-                    "error": f"Missing required field: {field}",
-                }
-            ), HTTPStatus.BAD_REQUEST
+        data = patient_schema.load(request.get_json())
+    except ValidationError as err:
+        return jsonify({"success": False, "errors": err.messages}), HTTPStatus.BAD_REQUEST
 
-    if data['gender'] not in ['Male', 'Female']:
-        return jsonify({
-            "success": False,
-            "error": "Invalid value for 'gender'. Allowed values are 'Male' or 'Female'."
-        }), HTTPStatus.BAD_REQUEST
-
-    try:
-        date_of_birth = datetime.strptime(data['date_of_birth'], '%Y-%m-%d').date()
-    except ValueError:
-        return jsonify({
-            "success": False,
-            "error": "Invalid date format for 'date_of_birth'. Expected 'YYYY-MM-DD'."
-        }), HTTPStatus.BAD_REQUEST
-
-    new_patient = Patient(
-        first_name=data['first_name'],
-        middle_name=data.get('middle_name', None),
-        last_name=data['last_name'],
-        gender=data['gender'], 
-        date_of_birth=date_of_birth,
-        address=data.get('address', None)
-    )
-
+    new_patient = Patient(**data)
     db.session.add(new_patient)
     db.session.commit()
 
-    return jsonify(
-        {
-            "success": True,
-            "data": new_patient.to_dict(),
-        }
-    ), HTTPStatus.CREATED
+    return jsonify({"success": True, "data": new_patient.to_dict()}), HTTPStatus.CREATED
 
 @app.route("/api/patients/<int:patient_id>", methods=["PUT"])
 @jwt_required()
