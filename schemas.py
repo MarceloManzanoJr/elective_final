@@ -2,14 +2,25 @@ from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from http import HTTPStatus
 from datetime import datetime
+from dotenv import load_dotenv
+from functools import wraps
+from marshmallow import Schema, fields, ValidationError
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt
+import os
+
+load_dotenv()
 
 app = Flask(__name__)
 
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost/health_center'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'your_secret_key')  # Replace with a strong secret key
+app.config['DEBUG'] = True
+app.config['JWT_ERROR_MESSAGE_KEY'] = "msg"
 
 db = SQLAlchemy(app)
+jwt = JWTManager(app)
 
 class Patient(db.Model):
     __tablename__ = 'patients'
