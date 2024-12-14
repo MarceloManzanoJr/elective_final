@@ -80,6 +80,11 @@ def login():
 
     return jsonify({"error": "Invalid credentials"}), HTTPStatus.UNAUTHORIZED
 
+@app.route('/api/admin', methods=['GET'])
+@jwt_required()
+@role_required('admin')
+def admin_only():
+    return jsonify({"message": "Welcome, admin!"}), HTTPStatus.OK
 
 
 @app.route("/api/patients", methods=["GET"])
